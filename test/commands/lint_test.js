@@ -10,7 +10,6 @@
 
 'use strict';
 
-const path = require('path');
 const assert = require('chai').assert;
 const ProjectConfig = require('../../lib/project-config').ProjectConfig;
 const PolymerCli = require('../../lib/polymer-cli').PolymerCli;
@@ -38,7 +37,31 @@ suite('lint', () => {
     let cli = new PolymerCli(['lint'], testLintConfig);
     cli.run();
     assert.isOk(polylintCliStub.calledOnce);
-    assert.deepEqual(polylintCliStub.firstCall.args[0].input, [`${path.sep}index.html`, `${path.sep}bar.html`, `${path.sep}foo.html`]);
+    assert.deepEqual(polylintCliStub.firstCall.args[0].input, ['index.html', 'bar.html', 'foo.html']);
+  });
+
+  test('lints the given files when provided through the `input` argument', () => {
+    let testLintConfig = new ProjectConfig(null, {
+      entrypoint: 'index.html',
+      fragments: ['foo.html'],
+      shell: 'bar.html',
+    });
+    let cli = new PolymerCli(['lint', '--input', 'PATH/TO/TEST_THIS_FILE.html'], testLintConfig);
+    cli.run();
+    assert.isOk(polylintCliStub.calledOnce);
+    assert.deepEqual(polylintCliStub.firstCall.args[0].input, ['PATH/TO/TEST_THIS_FILE.html']);
+  });
+
+  test('lints the given files when provided through the default arguments', () => {
+    let testLintConfig = new ProjectConfig(null, {
+      entrypoint: 'index.html',
+      fragments: ['foo.html'],
+      shell: 'bar.html',
+    });
+    let cli = new PolymerCli(['lint', 'PATH/TO/TEST_THIS_FILE.html'], testLintConfig);
+    cli.run();
+    assert.isOk(polylintCliStub.calledOnce);
+    assert.deepEqual(polylintCliStub.firstCall.args[0].input, ['PATH/TO/TEST_THIS_FILE.html']);
   });
 
 });
